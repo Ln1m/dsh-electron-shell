@@ -7,6 +7,9 @@ const { app, session, shell } = require('electron')
 
 const EMBED_PARTITION = 'persist:dsh-embedded-browser'
 const EMBED_PRELOAD = path.join(__dirname, 'preload-embed.js')
+const EMBED_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/'
+  + process.versions.chrome + ' Safari/537.36'
+const EMBED_ACCEPT_LANGUAGES = 'zh-CN,zh;q=0.9,en;q=0.8'
 
 class DesktopBrowserGuests {
   constructor(options) {
@@ -118,6 +121,7 @@ class DesktopBrowserGuests {
   }
 
   configureSession(browserSession) {
+    browserSession.setUserAgent(EMBED_USER_AGENT, EMBED_ACCEPT_LANGUAGES)
     browserSession.setPermissionRequestHandler((_contents, _permission, callback) => { callback(false) })
     browserSession.setPermissionCheckHandler(() => false)
     browserSession.setDevicePermissionHandler(() => false)
