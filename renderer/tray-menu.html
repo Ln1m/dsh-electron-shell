@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<title>DeepSeek Harness</title>
+<style>
+  :root {
+    --bg: #1b1b1e;
+    --fg: #ececef;
+    --muted: #9b9ba4;
+    --hover: rgba(255, 255, 255, .07);
+    --line: rgba(255, 255, 255, .09);
+    --danger: #e5645f;
+    --shadow: 0 8px 22px rgba(0, 0, 0, .48);
+  }
+  [data-theme="light"] {
+    --bg: #ffffff;
+    --fg: #1d1d1f;
+    --muted: #6f6f76;
+    --hover: rgba(0, 0, 0, .055);
+    --line: rgba(0, 0, 0, .08);
+    --danger: #c8392f;
+    --shadow: 0 8px 22px rgba(0, 0, 0, .18);
+  }
+  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
+  body {
+    padding: 10px;
+    box-sizing: border-box;
+    color: var(--fg);
+    cursor: default;
+    user-select: none;
+    font: 13px/1.2 "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Microsoft YaHei UI", sans-serif;
+  }
+  .menu {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 4px;
+    overflow: hidden;
+  }
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 8px 8px;
+    color: var(--muted);
+    font-size: 11px;
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: #5cc98a; flex: none; }
+  .dot.off { background: #cf9a4b; }
+  .head .port { margin-left: auto; font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    height: 32px;
+    padding: 0 9px;
+    border-radius: 7px;
+    white-space: nowrap;
+  }
+  .item:hover { background: var(--hover); }
+  .item.danger:hover { background: color-mix(in srgb, var(--danger) 15%, transparent); color: var(--danger); }
+  .item svg { width: 15px; height: 15px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; opacity: .82; }
+  .sep { height: 1px; margin: 4px 8px; background: var(--line); }
+</style>
+</head>
+<body>
+  <div class="menu" id="menu">
+    <div class="head">
+      <span class="dot" id="dot"></span>
+      <span id="status">引擎运行中</span>
+      <span class="port" id="port"></span>
+    </div>
+    <div class="item" data-action="open">
+      <svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M2 6h12"/></svg>
+      <span>打开主界面</span>
+    </div>
+    <div class="item" data-action="reload">
+      <svg viewBox="0 0 16 16"><path d="M13 8a5 5 0 1 1-1.6-3.7"/><path d="M13 2.5V5h-2.5"/></svg>
+      <span>重新加载界面</span>
+    </div>
+    <div class="item" data-action="restart">
+      <svg viewBox="0 0 16 16"><path d="M8 2.5v5"/><path d="M12.4 4.6a6 6 0 1 1-8.8 0"/></svg>
+      <span>重启 DSH 后端</span>
+    </div>
+    <div class="sep"></div>
+    <div class="item danger" data-action="quit">
+      <svg viewBox="0 0 16 16"><path d="M6.5 3H4a1.5 1.5 0 0 0-1.5 1.5v7A1.5 1.5 0 0 0 4 13h2.5"/><path d="M10 5.5 13 8l-3 2.5"/><path d="M13 8H6.5"/></svg>
+      <span>退出 DSH</span>
+    </div>
+  </div>
+<script>
+  const api = window.dshTray
+  const menu = document.getElementById('menu')
+
+  function fit() {
+    const rect = menu.getBoundingClientRect()
+    api.ready({ width: Math.ceil(rect.width) + 22, height: Math.ceil(rect.height) + 22 })
+  }
+
+  document.querySelectorAll('.item').forEach((item) => {
+    item.addEventListener('click', () => { api.action(item.dataset.action) })
+  })
+
+  window.addEventListener('keydown', (event) => { if (event.key === 'Escape') api.close() })
+
+  api.onStatus((status) => {
+    if (status === null || typeof status !== 'object') return
+    document.documentElement.dataset.theme = status.dark ? 'dark' : 'light'
+    document.getElementById('port').textContent = status.port ? ':' + status.port : ''
+    document.getElementById('dot').className = status.up ? 'dot' : 'dot off'
+    document.getElementById('status').textContent = status.up ? '引擎运行中' : '引擎未运行'
+    requestAnimationFrame(fit)
+  })
+
+  window.addEventListener('load', fit)
+  fit()
+</script>
+</body>
+</html>

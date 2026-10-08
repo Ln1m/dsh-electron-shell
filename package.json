@@ -1,0 +1,7 @@
+{
+  "name": "dsh-electron-shell",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DeepSeek Harness Electron shell",
+  "main": "src/main.js"
+}
