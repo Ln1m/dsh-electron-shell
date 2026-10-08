@@ -574,8 +574,10 @@ if (!app.requestSingleInstanceLock()) {
     if (kind === 'splash-ended' || kind === 'splash-skip') {
       const target = splashWindow
       splashWindow = null
-      try { if (target !== null && !target.isDestroyed()) target.destroy() } catch { /* ignore */ }
       revealPage()
+      setTimeout(() => {
+        try { if (target !== null && !target.isDestroyed()) target.destroy() } catch { /* ignore */ }
+      }, 340)
     }
   })
 
